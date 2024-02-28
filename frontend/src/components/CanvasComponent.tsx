@@ -5,31 +5,20 @@ const CanvasDraw: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [prevPos, setPrevPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [textColor, setTextColor] = useState("#000000");
-  const [fontSize, setFontSize] = useState(5);
+  const [fontSize, setFontSize] = useState(2);
+  const [backgroundColor ,setBackgroundColor] = useState("#ffffff")
 
 
   const colorChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value);
     setTextColor(e.target.value);
-    const canvas = canvasRef.current; 
-    if(canvas){
-      const ctx = canvas.getContext("2d");
-      if(ctx){
-        ctx.strokeStyle = e.target.value
-      } 
-    }
+  
   };
 
   const fontsizeChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value);
     setFontSize(parseInt(e.target.value));
-    const canvas = canvasRef.current; 
-    if(canvas){
-      const ctx = canvas.getContext("2d");
-      if(ctx){
-        ctx.lineWidth = parseInt(e.target.value)
-      } 
-    }
+   
   };
 
   useEffect(() => {
@@ -43,11 +32,14 @@ const CanvasDraw: React.FC = () => {
       const ctx = canvas?.getContext("2d");
       if (ctx) {
         ctx.lineCap = "round";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = fontSize;
+        ctx.fillStyle = backgroundColor
+        ctx.strokeStyle = textColor
+        ctx.fillRect(0, 0,600 ,400 );
       }
     }
    
-  }, []);
+  }, [fontSize,backgroundColor,textColor]);
 
   const startDrawing = (event: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
@@ -85,6 +77,20 @@ const CanvasDraw: React.FC = () => {
     }
     
   }
+  const handleDownload = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const link = document.createElement('a');
+    link.download = 'drawing.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
+
+  const backgroundColorChangeHandler = (e: ChangeEvent<HTMLInputElement>) =>{
+    setBackgroundColor(e.target.value)
+  }
 
   return (
 
@@ -94,11 +100,15 @@ const CanvasDraw: React.FC = () => {
       <div className="flex flex-row justify-around">
         <div className="flex flex-col mr-5">
           <p className="w-[144px]">Text color picker </p>
-          <input type="color" className="w-60" onChange={colorChangeHandler} value={textColor} />
+          <input type="color" className="w-40" onChange={colorChangeHandler} value={textColor} />
+        </div>
+        <div className="flex flex-col mr-5">
+          <p className="w-[144px]">Background </p>
+          <input type="color" className="w-40" onChange={backgroundColorChangeHandler} value={backgroundColor} />
         </div>
         <div className="flex flex-col mr-5">
           <p className="w-[144px]">Font Size </p>
-          <input type="number" id="quantity" name="quantity" min="1" max="10" step="1" value={fontSize} className="border border-black w-60" onChange={fontsizeChangeHandler} />
+          <input type="number" id="quantity" name="quantity" min="1" max="10" step="1" value={fontSize} className="border border-black w-30" onChange={fontsizeChangeHandler} />
         </div>
       </div>
       <div className="mt-4">
@@ -114,7 +124,7 @@ const CanvasDraw: React.FC = () => {
       </div>
       <div className="flex flex-row mt-5 justify-around">
         <button className="focus:outline-none text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900 w-60" onClick={clearCanvas}>Clear</button>
-        <button className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900 w-60"> Save & download </button>
+        <button className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900 w-60" onClick={handleDownload}> Save & download </button>
 
       </div>
     </div>

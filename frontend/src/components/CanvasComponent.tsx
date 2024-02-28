@@ -41,18 +41,19 @@ const CanvasDraw: React.FC = () => {
    
   }, [fontSize,backgroundColor,textColor]);
 
-  const startDrawing = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const startDrawing = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
-    setPrevPos({ x: event.nativeEvent.offsetX, y: event.nativeEvent.offsetY });
+    const pos = getMouseOrTouchPosition(event);
+    setPrevPos({ x: pos.x, y: pos.y });
   };
 
-  const draw = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (ctx) {
-      const currentPos = { x: event.nativeEvent.offsetX, y: event.nativeEvent.offsetY };
+      const currentPos = getMouseOrTouchPosition(event);
 
       ctx.beginPath();
       ctx.moveTo(prevPos.x, prevPos.y);
@@ -92,6 +93,20 @@ const CanvasDraw: React.FC = () => {
     setBackgroundColor(e.target.value)
   }
 
+
+  const getMouseOrTouchPosition = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>): { x: number, y: number } => {
+    let x = 0;
+    let y = 0;
+    if (event.type === "mousedown" || event.type === "mousemove" || event.type === "mouseup" || event.type === "mouseout") {
+      x = (event as React.MouseEvent<HTMLCanvasElement>).nativeEvent.offsetX;
+      y = (event as React.MouseEvent<HTMLCanvasElement>).nativeEvent.offsetY;
+    } else if (event.type === "touchstart" || event.type === "touchmove" || event.type === "touchend") {
+      x = (event as React.TouchEvent<HTMLCanvasElement>).touches[0].clientX - canvasRef.current!.getBoundingClientRect().left;
+      y = (event as React.TouchEvent<HTMLCanvasElement>).touches[0].clientY - canvasRef.current!.getBoundingClientRect().top;
+    }
+    return { x, y };
+  };
+
   return (
 
 
@@ -118,6 +133,9 @@ const CanvasDraw: React.FC = () => {
       onMouseMove={draw}
       onMouseUp={stopDrawing}
       onMouseOut={stopDrawing}
+      onTouchStart={startDrawing}
+      onTouchMove={draw}
+      onTouchEnd={stopDrawing}
       className=" border border-black"
       
     />

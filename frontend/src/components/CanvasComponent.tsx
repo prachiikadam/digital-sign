@@ -42,12 +42,14 @@ const CanvasDraw: React.FC = () => {
   }, [fontSize,backgroundColor,textColor]);
 
   const startDrawing = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    event.preventDefault()
     setIsDrawing(true);
     const pos = getMouseOrTouchPosition(event);
     setPrevPos({ x: pos.x, y: pos.y });
   };
 
   const draw = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    event.preventDefault()
     if (!isDrawing || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
